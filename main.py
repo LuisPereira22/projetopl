@@ -4,25 +4,6 @@ from cql_lexer import lexer
 from cql_parser import parser
 from executor import CommandExecutor
 
-def verificar_colunas():
-    with open('observacoes.csv', 'r', encoding='utf-8') as file:
-        reader = csv.DictReader(file)
-        colunas = reader.fieldnames
-        print("Colunas do arquivo observacoes.CSV:", colunas)
-
-        # Lê os dados e converte as colunas necessárias para float
-        dados_observacoes = {'columns': reader.fieldnames, 'data': [row for row in reader]}
-        for row in dados_observacoes['data']:
-            row['IntensidadeVentoKM'] = float(row['IntensidadeVentoKM'])  # IntensidadeVentoKM
-            row['Temperatura'] = float(row['Temperatura'])  # Temperatura
-            row['Radiação'] = float(row['Radiação'])  # Radiação
-            row['IntensidadeVento'] = float(row['IntensidadeVento'])  # IntensidadeVento
-            row['Humidade'] = float(row['Humidade'])  # Humidade
-
-    with open('estacoes.csv', 'r', encoding='utf-8') as file:
-        reader = csv.DictReader(file)
-        colunas = reader.fieldnames
-        print("Colunas do arquivo estacoes.CSV:", colunas)
 
 
 def processar_entrada_fca(arquivo):
@@ -54,7 +35,6 @@ def processar_entrada_fca(arquivo):
                 print(f"Erro ao processar comando '{linha.strip()}': {e}")
 
 def main():
-    verificar_colunas()
     executor = CommandExecutor()
     # Processar o arquivo 'entrada.fca' se for fornecido como argumento
     if len(sys.argv) > 1:
@@ -69,12 +49,11 @@ def main():
                     break
                 if code.lower().startswith('print table'):
                     table_name = code.split()[2]  # Extrai o nome da tabela
-                    output = executor.execute(('PRINT', 'TABLE', table_name))
-                    if output:
-                        print(f"Tabela '{table_name}':")
-                        print(output)
-                    else:
-                        print(f"Erro: Tabela '{table_name}' não encontrada")
+                    try:
+                        # Tenta imprimir a tabela
+                        executor.execute(('PRINT', 'TABLE', table_name))
+                    except ValueError as e:
+                        print(f"Erro: {e}")
                 else:
                     result = parser.parse(code)
                     if result:

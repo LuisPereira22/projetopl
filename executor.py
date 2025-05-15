@@ -26,7 +26,7 @@ class CommandExecutor:
             self.table_manager.rename_table(old_name, new_name)
             
         elif cmd_type == 'PRINT':
-            _, table_name = command
+            _, _, table_name = command  # Agora desempacota a tupla corretamente
             self.table_manager.print_table(table_name)
             
         elif cmd_type == 'SELECT':

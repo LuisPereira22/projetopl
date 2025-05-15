@@ -4,10 +4,19 @@ class TableManager:
     def __init__(self):
         self.tables = {}
 
+
     def import_table(self, table_name, file_path):
-        data = parse_csv(file_path)
-        print(f"[DEBUG] Dados carregados para '{table_name}': {data}")  # Verifique o formato aqui
-        self.tables[table_name] = data
+        parsed = parse_csv(file_path)
+        columns = parsed['columns']
+        data = parsed['data']
+    
+        self.tables[table_name] = {
+            'columns': columns,
+            'data': data
+        }
+
+        print(f"[DEBUG] Colunas: {columns}")
+        print(f"[DEBUG] Dados: {data}")
 
     def export_table(self, table_name, file_path):
         if table_name in self.tables:
@@ -37,7 +46,8 @@ class TableManager:
         
             # Itera sobre as linhas de dados
             for row in table['data']:
-                # Imprime cada linha, com valores separados por ' | '
+                # Cada 'row' tem 3 elementos: Id, Local, Coordenadas
+                # Imprimimos a linha, convertendo os elementos para string
                 print(" | ".join(str(x) for x in row))
         else:
             raise ValueError(f"Tabela '{table_name}' não encontrada")
